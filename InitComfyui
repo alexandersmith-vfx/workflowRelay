@@ -1,0 +1,37 @@
+import nuke
+import os
+import sys
+import subprocess
+
+# Function to launch ComfyUI from within Nuke
+# Adjust COMFYUI_DIR environment variable or hard-code your install path
+# Place the InitComfyUI script into your local ~/.nuke/python/ dir
+
+def launch_comfyui():
+    # Locate ComfyUI directory
+    comfyui_dir = os.getenv("COMFYUI_DIR", "/path/to/ComfyUI")
+    comfyui_script = os.path.join(comfyui_dir, "main.py")  # or "app.py" depending on ComfyUI version
+
+    if not os.path.exists(comfyui_script):
+        nuke.message(f"ComfyUI script not found at {comfyui_script}")
+        return
+
+    # Use the same Python interpreter that Nuke is running under
+    python_exec = sys.executable
+
+    try:
+        subprocess.Popen([python_exec, comfyui_script], cwd=comfyui_dir)
+    except Exception as e:
+        nuke.message(f"Failed to launch ComfyUI: {e}")
+
+# Add the ComfyUI menu item
+menu = nuke.menu("Nuke")
+comfy_menu = menu.addMenu("ComfyUI")
+comfy_menu.addCommand("Launch ComfyUI", launch_comfyui, "ctrl+alt+C")
+
+# Installation - - - >
+# 1. Place this file in your .nuke/python/ directory or add to pluginPath in init.py
+# 2. Set the environment variable COMFYUI_DIR to point at your ComfyUI install
+#    e.g. export COMFYUI_DIR="/Users/you/ComfyUI"
+# 3. Restart Nuke. Under the "ComfyUI" menu you can now choose "Launch ComfyUI" (or press Ctrl+Alt+C).
+# 4. For any questions or support, email me at me@alexandersmith.net with the subject line: "ComfyUI - HELP!"
